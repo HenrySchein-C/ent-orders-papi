@@ -1,0 +1,41 @@
+operations:
+  constants:
+    cron:
+      us: "* 0/1 * * * ? *"
+      can: "* 0/1 * * * ? *"
+    source: "EnT"
+    target: "Siebel"
+    country:
+      us: "US"
+      canada: "Canada"
+    errorType:
+      badRequest: "APIKIT:BAD_REQUEST"
+      notFound: "APIKIT:NOT_FOUND"
+      methodNotAllowed: "APIKIT:METHOD_NOT_ALLOWED"
+      notAcceptable: "APIKIT:NOT_ACCEPTABLE"
+      unsupportedMediaType: "APIKIT:UNSUPPORTED_MEDIA_TYPE"
+      notImplemented: "APIKIT:NOT_IMPLEMENTED"
+      gatewayTimeout: "HTTP:GATEWAY_TIMEOUT"
+
+    errorCode:
+      badRequest: "400"
+      notFound: "404"
+      methodNotAllowed: "405"
+      notAcceptable: "500"
+      unsupportedMediaType: "415"
+      notImplemented: "501"
+      internalServerError: "500"
+    response:
+      code:
+        success: "200"
+    status:
+      success: "SUCCESS"
+      failure: "ERROR"
+http:
+  listener:
+    port: "8092"
+  request:
+    basepath: "/dev/sapi/ent-orders-siebel/v1"
+    sbasepath: "/dev/sapi/ent-orders-salesforce/v1"
+    
+    

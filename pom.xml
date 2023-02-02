@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>us.co.hs</groupId>
+	<artifactId>et-orders-sapi</artifactId>
+	<version>1.0.0</version>
+	<packaging>mule-application</packaging>
+
+	<name>et-orders-sapi</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<app.runtime>4.4.0-20221212</app.runtime>
+		<mule.maven.plugin.version>3.8.0</mule.maven.plugin.version>
+		<munit.version>2.3.13</munit.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<version>${mule.maven.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<cloudHubDeployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<muleVersion>${muleVersion}</muleVersion>
+						<connectedAppClientId>${connectedAppClientId}</connectedAppClientId>
+						<connectedAppClientSecret>${connectedAppClientSecret}</connectedAppClientSecret>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
+						<businessGroup>${business_group}</businessGroup>
+						<region>${region}</region>
+						<environment>${environment}</environment>
+						<applicationName>${application_name}</applicationName>
+						<workers>${workers}</workers>
+						<workerType>${workerTpe}</workerType>
+						<objectStoreV2>${objectStore}</objectStoreV2>
+						<!-- API Properties -->
+						<properties>
+							<!-- jdedwards -->
+							<as400.truststore.password>${as400.truststore.password}</as400.truststore.password>
+							<as400.us.host>${as400.us.host}</as400.us.host>
+							<as400.us.password>${as400.us.password}</as400.us.password>
+							<as400.us.username>${as400.us.username}</as400.us.username>
+							<as400.us.librarylist>${as400.us.librarylist}</as400.us.librarylist>
+							<as400.us.db.beanconfig.maxTotal>${as400.us.librarylist}</as400.us.db.beanconfig.maxTotal>
+							<as400.us.db.beanconfig.maxWaitMillis>${as400.us.db.beanconfig.maxWaitMillis}</as400.us.db.beanconfig.maxWaitMillis>
+							<as400.us.db.beanconfig.initialSize>${as400.us.db.beanconfig.initialSize}</as400.us.db.beanconfig.initialSize>
+							<as400.us.db.beanconfig.logExpiredConnections>${as400.us.db.beanconfig.logExpiredConnections}</as400.us.db.beanconfig.logExpiredConnections>
+							<as400.us.db.beanconfig.removeAbandonedOnBorrow>${as400.us.db.beanconfig.removeAbandonedOnBorrow}</as400.us.db.beanconfig.removeAbandonedOnBorrow>
+							<as400.us.db.beanconfig.removeAbandonedTimeout>${as400.us.db.beanconfig.removeAbandonedTimeout}</as400.us.db.beanconfig.removeAbandonedTimeout>
+							<as400.us.db.beanconfig.testWhileIdle>${as400.us.db.beanconfig.testWhileIdle}</as400.us.db.beanconfig.testWhileIdle>
+							<as400.us.db.beanconfig.testOnBorrow>${as400.us.db.beanconfig.testOnBorrow}</as400.us.db.beanconfig.testOnBorrow>
+							<as400.us.db.beanconfig.testOnReturn>${as400.us.db.beanconfig.testOnReturn}</as400.us.db.beanconfig.testOnReturn>
+							<as400.us.db.beanconfig.timeBetweenEvictionRunsMillis>${as400.us.db.beanconfig.timeBetweenEvictionRunsMillis}</as400.us.db.beanconfig.timeBetweenEvictionRunsMillis>
+							<as400.us.db.beanconfig.minEvictableIdleTimeMillis>${as400.us.db.beanconfig.minEvictableIdleTimeMillis}</as400.us.db.beanconfig.minEvictableIdleTimeMillis>
+							<as400.us.db.beanconfig.maxConnLifetimeMillis>${as400.us.db.beanconfig.maxConnLifetimeMillis}</as400.us.db.beanconfig.maxConnLifetimeMillis>
+							<as400.us.db.beanconfig.maxidle>${as400.us.db.beanconfig.maxidle}</as400.us.db.beanconfig.maxidle>
+							<as400.reconnection.attempts>${as400.reconnection.attempts}</as400.reconnection.attempts>
+							<as400.reconnection.frequency>${as400.reconnection.frequency}</as400.reconnection.frequency>
+							<as400.can.host>${as400.can.host}</as400.can.host>
+							<as400.can.password>${as400.can.password}</as400.can.password>
+							<as400.can.username>${as400.can.username}</as400.can.username>
+							<as400.can.librarylist>${as400.can.librarylist}</as400.can.librarylist>
+							<as400.can.db.beanconfig.maxTotal>${as400.can.librarylist}</as400.can.db.beanconfig.maxTotal>
+							<as400.can.db.beanconfig.maxWaitMillis>${as400.can.db.beanconfig.maxWaitMillis}</as400.can.db.beanconfig.maxWaitMillis>
+							<as400.can.db.beanconfig.initialSize>${as400.can.db.beanconfig.initialSize}</as400.can.db.beanconfig.initialSize>
+							<as400.can.db.beanconfig.logExpiredConnections>${as400.can.db.beanconfig.logExpiredConnections}</as400.can.db.beanconfig.logExpiredConnections>
+							<as400.can.db.beanconfig.removeAbandonedOnBorrow>${as400.can.db.beanconfig.removeAbandonedOnBorrow}</as400.can.db.beanconfig.removeAbandonedOnBorrow>
+							<as400.can.db.beanconfig.removeAbandonedTimeout>${as400.can.db.beanconfig.removeAbandonedTimeout}</as400.can.db.beanconfig.removeAbandonedTimeout>
+							<as400.can.db.beanconfig.testWhileIdle>${as400.can.db.beanconfig.testWhileIdle}</as400.can.db.beanconfig.testWhileIdle>
+							<as400.can.db.beanconfig.testOnBorrow>${as400.can.db.beanconfig.testOnBorrow}</as400.can.db.beanconfig.testOnBorrow>
+							<as400.can.db.beanconfig.testOnReturn>${as400.can.db.beanconfig.testOnReturn}</as400.can.db.beanconfig.testOnReturn>
+							<as400.can.db.beanconfig.timeBetweenEvictionRunsMillis>${as400.can.db.beanconfig.timeBetweenEvictionRunsMillis}</as400.can.db.beanconfig.timeBetweenEvictionRunsMillis>
+							<as400.can.db.beanconfig.minEvictableIdleTimeMillis>${as400.can.db.beanconfig.minEvictableIdleTimeMillis}</as400.can.db.beanconfig.minEvictableIdleTimeMillis>
+							<as400.can.db.beanconfig.maxConnLifetimeMillis>${as400.can.db.beanconfig.maxConnLifetimeMillis}</as400.can.db.beanconfig.maxConnLifetimeMillis>
+							<as400.can.db.beanconfig.maxidle>${as400.can.db.beanconfig.maxidle}</as400.can.db.beanconfig.maxidle>
+							<!-- objectStore_config -->
+							<objectstore.reconnection.attempts>${objectstore.reconnection.attempts}</objectstore.reconnection.attempts>
+							<objectstore.reconnection.frequency>${objectstore.reconnection.frequency}</objectstore.reconnection.frequency>
+							<objectstore.entry.ttl.restriction>${objectstore.entry.ttl.restriction}</objectstore.entry.ttl.restriction>
+							<operations.constants.restriction.batchSize>${operations.constants.restriction.batchSize}</operations.constants.restriction.batchSize>
+							<!-- http_config -->
+							<http.request.timeout>${http.request.timeout}</http.request.timeout>
+							<http.request.basepath>${http.request.basepath}</http.request.basepath>
+							<http.request.host>${http.request.host}</http.request.host>
+							<http.request.port>${http.request.port}</http.request.port>
+							<http.request.client.secret>${http.request.client.secret}</http.request.client.secret>
+							<http.request.client.id>${http.request.client.id}</http.request.client.id>
+							<!-- anypointPlatform_config -->
+							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
+							<anypoint.platform.visualizer.layer>${api_layer}</anypoint.platform.visualizer.layer>
+						</properties>
+					</cloudHubDeployment>
+					<classifier>mule-application</classifier>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mulesoft.munit.tools</groupId>
+				<artifactId>munit-maven-plugin</artifactId>
+				<version>${munit.version}</version>
+				<executions>
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+							<goal>coverage-report</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<coverage>
+						<runCoverage>true</runCoverage>
+						<formats>
+							<format>html</format>
+						</formats>
+					</coverage>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-http-connector</artifactId>
+			<version>1.7.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>49b22249-fe43-449c-8967-bb4b7fb48942</groupId>
+			<artifactId>common-logging</artifactId>
+			<version>1.0.1</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-runner</artifactId>
+			<version>2.3.13</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-tools</artifactId>
+			<version>2.3.13</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.weave</groupId>
+			<artifactId>assertions</artifactId>
+			<version>1.0.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Anypoint Exchange</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<layout>default</layout>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>

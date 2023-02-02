@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="eandt-orders-papi-test-suite.xml" />
+	<munit:test name="eandt-orders-papi-test-suite-eandt-orders-papiFlowTest" doc:id="334f06b9-97d7-413b-8b97-ee78369597f3" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="6ec2762a-8c16-44a0-82e7-06fb062c31f5" processor="http:listener">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Listener" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="HTTP_Listener_config_test" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ab496461-ae8f-4e61-bcdf-89e352655556" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="${http.request.basepath}/orders" attributeName="path" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="46c3dedc-cdd3-49ab-b4e2-7b61985d1262" processor="when">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="#[sizeOf(payload.recordIds)&gt;0]" attributeName="expression" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="17c65a3c-5ce9-4c2e-9cfc-7c6a32e070e3" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="invoke-CLOB-siebel-sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="15dc74bc-d695-430b-ba81-873eb11aa401" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="callSalesforceSapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e5b7975e-9b1c-4519-8522-c4f3587aa7c7" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PUT" attributeName="method" />
+					<munit-tools:with-attribute whereValue="SiebelSapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to eandt-orders-papiFlow" doc:id="60a16f0c-26c9-4ed7-b099-83bb5128736d" name="eandt-orders-papiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="52d415f3-4a67-4343-936b-1d4a3821a187" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

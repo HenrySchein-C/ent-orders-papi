@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<tls:context name="tls_inbound_listner_config" doc:name="TLS KeyStore Context" doc:id="651ceccf-355d-4823-a235-60f5874ae8eb">
+        <tls:key-store type="jks" path="${listener.keystore.path}" alias="${listener.keystore.key.alias}" keyPassword="${listener.keystore.key.password}" password="${listener.keystore.password}" />
+    </tls:context>
+	<http:request-config
+		name="sapi_http_request_configuration"
+		doc:name="HTTP Request configuration"
+		doc:id="e3d87931-2736-4701-b6f5-20eaba381b29"
+		responseTimeout="${http.request.timeout}">
+		<http:request-connection protocol="HTTPS"
+			host="${http.request.host}" port="${http.request.port}" />
+	</http:request-config>
+	<http:listener-config name="HTTP_Listener_config_test" doc:name="HTTP Listener config" doc:id="5b617c6a-5315-4310-b0d1-e9de28b136db" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="f07ce639-2b89-41f8-b368-61d954bfe4ce" file="properties\config.yaml" />
+</mule>
