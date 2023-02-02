@@ -29,8 +29,8 @@ operations:
       code:
         success: "200"
     status:
-      success: "SUCCESS"
-      failure: "ERROR"
+      success: "success"
+      error: "error"
 http:
   listener:
     port: "8092"

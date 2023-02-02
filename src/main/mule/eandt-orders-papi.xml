@@ -1,36 +1,164 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:module-logging="http://www.mulesoft.org/schema/mule/module-logging" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+<mule
+	xmlns:module-logging="http://www.mulesoft.org/schema/mule/module-logging"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schema/mule/module-logging/current/mule-module-logging.xsd">
-	
-	<flow name="eandt-orders-papiFlow" doc:id="0f0e6ab2-9539-4af5-bcc9-cad2cf47108d" >
-		<http:listener doc:name="Listener" doc:id="bd7d5901-b176-4986-9ec3-096fe7636561" path="/sapi" config-ref="HTTP_Listener_config_test"/>
-		<ee:transform doc:name="Set Flow Variables" doc:id="f4db8469-bfb5-421b-928a-34d952fe5c98">
-			<ee:message />
-			<ee:variables>
-				<ee:set-variable resource="dataweave/vCurrentTime.dwl" variableName="vStartTime" />
-				<ee:set-variable resource="dataweave/vCorrelationId.dwl" variableName="vCorrelationId" />
-				<ee:set-variable resource="dataweave/vFlowName.dwl" variableName="vFlowName" />
-				<ee:set-variable resource="vRequestMethod.dwl" variableName="vRequestMethod" />
-				<ee:set-variable resource="vRequestUri.dwl" variableName="vRequestUri" />
-			</ee:variables>
-		</ee:transform>
-		<module-logging:start-logger doc:name="Start logger" doc:id="9c0335fb-933d-4391-b108-4f4e7772eec7" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Source="${operations.constants.source}" Target="${operations.constants.target}" Message="#['E &amp; T orders PAPI flow Started']" Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]"/>
+
+	<sub-flow name="update-Record-Data-Siebel-Sapi"
+		doc:id="8038b21c-9070-424b-93c9-4ac04169e8b3">
+		<set-variable value="#[now()]" doc:name="Set Variable"
+			doc:id="cabfddff-475b-442e-a00c-9320755d68e2"
+			variableName="vDebugStartTime" />
 		<module-logging:debug-start-logger
 			doc:name="Debug start logger"
-			doc:id="f8a00dc6-1847-4457-bd89-7563b46f908f"
+			doc:id="3b6c496d-beae-40cd-a8fd-03e55e85e604"
+			Application_Name="#[app.name]"
+			Flow_Name="update-Record-Data-Siebel-Sapi"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Update ENT orders in siebel call started for ' ++ vars.vRecordId]" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="59b4326c-515f-4d04-a4e2-e2565d3c17c9">
+			<ee:message>
+				<ee:set-payload
+					resource="dataweave/final-Siebel-Response-payload.dwl" />
+			</ee:message>
+		</ee:transform>
+		<http:request method="PUT" doc:name="SiebelSapi"
+			doc:id="2d065476-c55e-4c97-b99c-d3cf454bb08a"
+			config-ref="sapi_http_request_configuration"
+			path="#[Mule::p('http.request.basepath') ++ '/orderresponse/id/' ++ vars.vRecordId]">
+			<http:headers><![CDATA[#[output application/json
+---
+{
+	"client_id" : "2666b1bf9bed4ecdb3d3e6871b217a05",
+	"client_secret" : "d4cf6CdC5A3040bbB121A1Ee979bBAB0",
+	"x-origination-code" : "siebel",
+	"Content-Type" : "application/json",
+	"x-implementation": "ENT orders"
+}]]]></http:headers>
+		</http:request>
+		<module-logging:debug-end-logger
+			doc:name="Debug end logger"
+			doc:id="0b878d15-a9ee-43bf-89a1-e2796fcadd4b"
+			Application_Name="#[app.name]"
+			Flow_Name="update-Record-Data-Siebel-Sapi"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Updated ENT orders in siebel for ' ++ vars.vRecordId]"
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
+	</sub-flow>
+	<sub-flow name="load-Record-Data-Salesforce-Sapi"
+		doc:id="76db27bd-4d0d-4fe6-baae-1ea9b17331b0">
+		<set-variable value="#[now()]" doc:name="Set Variable"
+			doc:id="bd6e0de1-61c6-4280-a8f7-9e3536e51cff"
+			variableName="vDebugStartTime" />
+		<module-logging:debug-start-logger
+			doc:name="Debug start logger"
+			doc:id="c54fb065-a280-47d7-9804-e112b64c7dce"
 			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
 			Transaction_Id="#[vars.vCorrelationId]"
 			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="${operations.constants.source}" Target="${operations.constants.target}"
-			Message="#['Invoke siebel sapi for Debug started']"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-		<try doc:name="Try" doc:id="13329d68-bc85-4f26-9e1d-7fa0a6c70e5f" >
-			<http:request method="GET" doc:name="invoke E and T-Siebel-Sapi" doc:id="252251ca-9d46-45ff-9726-2516dc63f8a2" path="${http.request.basepath}/orders" config-ref="sapi_http_request_configuration" sendCorrelationId="ALWAYS">
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Debug call for salesforce sapi started']" />
+		<try doc:name="Try" doc:id="f2f9aad2-44de-4d7b-a24d-6c800bea5697">
+			<http:request method="POST"
+				doc:name="callSalesforceSapi"
+				doc:id="05b4e3bc-4fbd-4d9a-8978-3d671f804f4c"
+				path="${http.request.sbasepath}/orders"
+				config-ref="sapi_http_request_configuration">
+				<http:headers><![CDATA[#[output application/json
+---
+{
+	"client_id" : "b8e8ae85a1eb4542a468d8986a41560e",
+	"client_secret" : "037b6946FAd147E996a908a7891F0399",
+	"x-origination-code" : "siebel",
+	"x-implementation": "acasdc"
+}]]]></http:headers>
+			</http:request>
+			<error-handler>
+				<on-error-continue enableNotifications="true"
+					logException="true" doc:name="On Error Continue"
+					doc:id="b1bcdfb9-8233-4b09-b177-f3c945c1785e">
+					<set-variable value="#[payload]"
+						doc:name="Set Variable"
+						doc:id="ceb6a2f0-cb39-4de1-9200-44e68360908c"
+						variableName="vErrorSet" />
+					<module-logging:error-logger
+						doc:name="Error logger"
+						doc:id="10601b5f-dc43-4446-830e-eb6178279d0a"
+						Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+						Transaction_Id="#[vars.vCorrelationId]"
+						Correlation_Id="#[vars.vCorrelationId]"
+						Environment="${environment}"
+						Source="${operations.constants.source}"
+						Target="${operations.constants.target}"
+						Error_Type="#[error.errorType.asString]"
+						Error_Description="#[error.description]"
+						Error_Message="#[error.errorMessage]"
+						Message="#['salesforce sapi of request call Errored at:' ++ now()]" />
+					<ee:transform doc:name="Transform Message"
+						doc:id="c8a56f8c-b469-4459-9bd3-2d86d32b40ba">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="vErrorType"><![CDATA[%dw 2.0
+output application/java
+---
+error.errorType.asString]]></ee:set-variable>
+							<ee:set-variable variableName="vErrorDescription"><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<module-logging:debug-end-logger
+			doc:name="Debug end logger"
+			doc:id="7957be74-3d62-41c3-bede-a9589adfca76"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['salesforce sapi call for Debug ended']"
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
+	</sub-flow>
+	<sub-flow name="get-Record-Data-Siebel-Sapi"
+		doc:id="2ac46424-1fd8-464d-9083-ea3de9439964">
+		<set-variable value="#[now()]" doc:name="Set Variable"
+			doc:id="45961dd2-ef6c-4915-b0b0-2ba45280640a"
+			variableName="vDebugStartTime" />
+		<module-logging:debug-start-logger
+			doc:name="Debug start logger"
+			doc:id="a9ebba4a-28b2-45d3-954e-597fe0668bfb"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Debug call for siebel sapi started']" />
+		<http:request method="GET"
+			doc:name="invoke-CLOB-siebel-sapi"
+			doc:id="f3111a6d-d354-4470-b9b0-be44c55e4f82"
+			config-ref="sapi_http_request_configuration"
+			path="#[Mule::p('http.request.basepath') ++ '/orders/id/' ++ payload]">
+			<http:body><![CDATA[#[{}]]]></http:body>
 			<http:headers><![CDATA[#[output application/json
 ---
 {
@@ -41,38 +169,35 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 	"x-implementation": "acasdc"
 }]]]></http:headers>
 		</http:request>
-			<error-handler >
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="746393fb-94eb-4262-bbdf-0b20280d342f" >
-					<flow-ref doc:name="call_siebel_error_sub_flow" doc:id="039a81ad-5113-404a-a17b-b2f289dc8bcb" name="eandt-orders-papi-siebel-error-sub-flow"/>
-				</on-error-continue>
-			</error-handler>
-		</try>
 		<module-logging:debug-end-logger
 			doc:name="Debug end logger"
-			doc:id="929e2e9c-b681-4171-b82a-ad4e80cfb5c6"
+			doc:id="6018222a-c9de-4ea8-befa-9a2832482a50"
 			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
 			Transaction_Id="#[vars.vCorrelationId]"
 			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="{operations.constants.source}" Target="{operations.constants.target}"
-			Message="#['Invoke siebel sapi for Debug end']"
-			Time_Taken="#[output application/json --- now()]"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-		<choice doc:name="check_Payload_Empty_Or_Not" doc:id="0626d86e-9b81-409e-bc75-93c8f854cab3">
-			<when expression="#[sizeOf(payload.recordIds)&gt;0]">
-				<parallel-foreach doc:name="process_Parallel_Orders" doc:id="91775c30-bec8-4011-8f5d-68110ec90209" collection="#[payload.recordIds]">
-					<module-logging:debug-start-logger
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Debug call for siebel sapi ended']"
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
+	</sub-flow>
+	<sub-flow name="get-Record-Id-Siebel-Sapi"
+		doc:id="5f8db23a-6885-4979-bafd-f039f3df781d">
+		<module-logging:debug-start-logger
 			doc:name="Debug start logger"
-			doc:id="a9ebba4a-28b2-45d3-954e-597fe0668bfb"
+			doc:id="f8a00dc6-1847-4457-bd89-7563b46f908f"
 			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
 			Transaction_Id="#[vars.vCorrelationId]"
 			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="${operations.constants.source}" Target="${operations.constants.target}"
-			Message="#['Debug call for siebel sapi started']"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-					<try doc:name="Try" doc:id="a0739f6f-50e7-4363-8bc5-29475a0e6ab1" >
-						<http:request method="GET" doc:name="invoke-CLOB-siebel-sapi" doc:id="f3111a6d-d354-4470-b9b0-be44c55e4f82" config-ref="sapi_http_request_configuration" path="#[Mule::p('http.request.basepath') ++ '/orders/id/']">
-				<http:body><![CDATA[#[{}]]]></http:body>
-						<http:headers><![CDATA[#[output application/json
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Invoke siebel sapi for Debug started']" />
+		<http:request method="GET"
+			doc:name="invoke E and T-Siebel-Sapi"
+			doc:id="252251ca-9d46-45ff-9726-2516dc63f8a2"
+			path="${http.request.basepath}/orders"
+			config-ref="sapi_http_request_configuration"
+			sendCorrelationId="ALWAYS">
+			<http:headers><![CDATA[#[output application/json
 ---
 {
 	"client_id" : "2666b1bf9bed4ecdb3d3e6871b217a05",
@@ -81,125 +206,93 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 	"Content-Type" : "application/json",
 	"x-implementation": "acasdc"
 }]]]></http:headers>
-						<http:uri-params><![CDATA[#[output application/java
----
-{
-	"recordIds" : "payload"
-}]]]></http:uri-params>
-			</http:request>
-						<error-handler >
-							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3572f099-64cf-4421-8ce9-80695eeaeb99" >
-								<flow-ref doc:name="call_siebel_error_sub_flow" doc:id="64bcd1ce-281c-4db8-b33e-26df75fdde8e" name="eandt-orders-papi-siebel-error-sub-flow"/>
-							</on-error-continue>
-						</error-handler>
-					</try>
-					<module-logging:debug-end-logger
+		</http:request>
+		<module-logging:debug-end-logger
 			doc:name="Debug end logger"
-			doc:id="6018222a-c9de-4ea8-befa-9a2832482a50"
+			doc:id="929e2e9c-b681-4171-b82a-ad4e80cfb5c6"
 			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
 			Transaction_Id="#[vars.vCorrelationId]"
 			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="${operations.constants.source}" Target="${operations.constants.target}"
-			Message="#['Debug call for siebel sapi ended']"
-			Time_Taken="#[output application/json --- now()]"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-					<module-logging:debug-start-logger
-			doc:name="Debug start logger"
-			doc:id="c54fb065-a280-47d7-9804-e112b64c7dce"
-			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
-			Transaction_Id="#[vars.vCorrelationId]"
-			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="${operations.constants.source}" Target="${operations.constants.target}"
-			Message="#['Debug call for salesforce sapi started']"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-					<logger level="INFO" doc:name="Logger" doc:id="9fd086af-e27e-43e4-8b13-21c096a2fc98" message="#[payload]"/>
-					<try doc:name="Try" doc:id="c4da2661-825f-4654-a58d-b06368325108" >
-						<http:request method="POST" doc:name="callSalesforceSapi" doc:id="05b4e3bc-4fbd-4d9a-8978-3d671f804f4c" path="${http.request.sbasepath}/orders" config-ref="sapi_http_request_configuration">
-						<http:headers><![CDATA[#[output application/json
----
-{
-	"client_id" : "b8e8ae85a1eb4542a468d8986a41560e",
-	"client_secret" : "037b6946FAd147E996a908a7891F0399",
-	"x-origination-code" : "siebel",
-	"x-implementation": "acasdc"
-}]]]></http:headers>
-					</http:request>
-						<error-handler >
-							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ba48bc2d-8028-4c62-9720-40ac5b669356" >
-								<flow-ref doc:name="call-salesforce-error-sub-flow" doc:id="746490be-ff92-422c-8065-b218f80f593b" name="eandt-orders-papi-salesforce-error-sub-flow"/>
-							</on-error-continue>
-						</error-handler>
-					</try>
-					<module-logging:debug-end-logger
-			doc:name="Debug end logger"
-			doc:id="7957be74-3d62-41c3-bede-a9589adfca76"
-			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
-			Transaction_Id="#[vars.vCorrelationId]"
-			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="{operations.constants.source}" Target="{operations.constants.target}"
-			Message="#['salesforce sapi call for Debug ended']"
-			Time_Taken="#[output application/json --- now()]"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-					<module-logging:debug-start-logger
-			doc:name="Debug start logger"
-			doc:id="3b6c496d-beae-40cd-a8fd-03e55e85e604"
-			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
-			Transaction_Id="#[vars.vCorrelationId]"
-			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="${operations.constants.source}" Target="${operations.constants.target}"
-			Message="#['Invoke siebel sapi for Debug started']"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-					<try doc:name="Try" doc:id="82620756-7c82-4520-af12-aec6a869d425" >
-						<http:request method="PUT" doc:name="SiebelSapi" doc:id="2d065476-c55e-4c97-b99c-d3cf454bb08a" config-ref="sapi_http_request_configuration" path="${http.request.basepath}/orderresponse/id/{recordId}">
-						<http:headers><![CDATA[#[output application/json
----
-{
-	"client_id" : Mule::p('http.request.headers.siebel.client.id'),
-	'x-correlation-id' : vars.vCorrelationId,
-	"client_secret" : Mule::p('http.request.headers.siebel.client.secret'),
-	"x-origination-code" : vars.vOriginationCode
-}]]]></http:headers>
-						<http:query-params><![CDATA[#[output application/java
----
-{
-	"RecordId" : "Value"
-}]]]></http:query-params>
-					</http:request>
-						<error-handler >
-							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c7aed0f3-f13f-45c3-9769-b75a44634f43" >
-								<flow-ref doc:name="call_siebel_error_sub_flow" doc:id="b24c2593-e179-4933-97c5-5b5450951a31" name="eandt-orders-papi-siebel-error-sub-flow"/>
-							</on-error-continue>
-						</error-handler>
-					</try>
-					<ee:transform doc:name="Transform Message" doc:id="bc7f206f-b050-4d8f-8d67-571a338f0df4">
-						<ee:message>
-							<ee:set-payload resource="dataweave/siebel-final-success-payload.dwl" />
-						</ee:message>
-						<ee:variables>
-							<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
-						</ee:variables>
-					</ee:transform>
-					<module-logging:debug-end-logger
-			doc:name="Debug end logger"
-			doc:id="0b878d15-a9ee-43bf-89a1-e2796fcadd4b"
-			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
-			Transaction_Id="#[vars.vCorrelationId]"
-			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
-			Source="{operations.constants.source}" Target="{operations.constants.target}"
+			Source="{operations.constants.source}"
+			Target="{operations.constants.target}"
 			Message="#['Invoke siebel sapi for Debug end']"
-			Time_Taken="#[output application/json --- now()]"
-			Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-		</parallel-foreach>
-			</when>
+			Time_Taken="#[output application/json --- now() - vars.vStartTime]" />
+	</sub-flow>
+	<flow name="eandt-orders-papiFlow"
+		doc:id="0f0e6ab2-9539-4af5-bcc9-cad2cf47108d">
+		<scheduler doc:name="Scheduler"
+			doc:id="5691f734-e5ea-4d69-b84e-1fc4446265e3">
+			<scheduling-strategy>
+
+				<fixed-frequency frequency="10" timeUnit="MINUTES" />
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Set Flow Variables" doc:id="f4db8469-bfb5-421b-928a-34d952fe5c98">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="dataweave/vCurrentTime.dwl" variableName="vStartTime" />
+				<ee:set-variable resource="dataweave/vCorrelationId.dwl" variableName="vCorrelationId" />
+				<ee:set-variable resource="dataweave/vFlowName.dwl" variableName="vFlowName" />
+			</ee:variables>
+		</ee:transform>
+		<module-logging:start-logger doc:name="Start logger" 
+			doc:id="9c0335fb-933d-4391-b108-4f4e7772eec7" 
+			Application_Name="#[app.name]" 
+			Flow_Name="#[vars.vFlowName]" 
+			Transaction_Id="#[vars.vCorrelationId]" 
+			Correlation_Id="#[vars.vCorrelationId]" 
+			Environment="${environment}" 
+			Source="${operations.constants.source}" 
+			Target="${operations.constants.target}"
+			Message="#['E &amp; T orders PAPI flow Started']"/>
+		<flow-ref doc:name="Flow Reference" doc:id="4dc6febb-f97a-4414-9c52-caa7a01bfca4" name="get-Record-Id-Siebel-Sapi" />
+		<choice doc:name="check_Payload_Empty_Or_Not" doc:id="0626d86e-9b81-409e-bc75-93c8f854cab3">
+			<when expression="#[sizeOf(payload.recordIds)&gt;0]">
+
+				<foreach doc:name="for_Each_Orders" doc:id="91775c30-bec8-4011-8f5d-68110ec90209" collection="#[payload.recordIds]">
+					<try doc:name="Try" doc:id="160d8679-8fa2-4629-a5f2-ca27587fdfb7" >
+						<set-variable value="#[payload]" doc:name="Set Variable" doc:id="13f55f42-e8d9-44bb-a623-24f75f4b1e2c" variableName="vRecordId" />
+						<flow-ref doc:name="Flow Reference" doc:id="89d741b4-bd42-421f-bd83-379341ad1a7f" name="get-Record-Data-Siebel-Sapi" />
+						<flow-ref doc:name="Flow Reference" doc:id="50712267-2a92-4163-ba4f-bc9bb83ec717" name="load-Record-Data-Salesforce-Sapi" />
+						<flow-ref doc:name="Flow Reference" doc:id="86c81006-6167-415b-8ef6-1002d7cd84eb" name="update-Record-Data-Siebel-Sapi" />
+						<error-handler >
+							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6de4434c-4e96-42cf-915c-f0b018fc3a2d" >
+								<module-logging:error-logger doc:name="Error logger" 
+								doc:id="9acb8860-283d-4d9f-9a29-03e800c32689" 
+								Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" 
+								Transaction_Id="#[vars.vCorrelationId]"
+								 Correlation_Id="#[vars.vCorrelationId]"
+								 Environment="${environment}" Source="${operations.constants.source}" Target="${operations.constants.target}"
+								  Error_Type="#[error.errorType.asString]" 
+								  Error_Description="#[error.description]" 
+								  Error_Message="#[error.errorMessage]" 
+								  Message="#['salesforce sapi of request call Errored at:' ++ now()]"/>
+							</on-error-continue>
+						</error-handler>
+					</try>
+		
+</foreach>
+			
+</when>
 			<otherwise >
-				<module-logging:process-logger doc:name="Process logger" doc:id="a3dfd91f-6f1d-4362-8781-019df093d79e" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Message="#['No E &amp; T orders Found for processing']" Method="#[vars.vRequestMethod]" Source="${operations.constants.source}" Target="${operations.constants.target}" Request_Path="#[vars.vRequestUri]"/>
+				<module-logging:process-logger 
+				doc:name="Process logger" 
+				doc:id="a3dfd91f-6f1d-4362-8781-019df093d79e" 
+				Application_Name="#[app.name]" 
+				Flow_Name="#[vars.vFlowName]" 
+				Transaction_Id="#[vars.vCorrelationId]" 
+				Correlation_Id="#[vars.vCorrelationId]" 
+				Environment="${environment}" 
+				Message="#['No E &amp; T orders Found for processing']" 
+				Method="#[vars.vRequestMethod]" 
+				Source="${operations.constants.source}" 
+				Target="${operations.constants.target}"
+				/>
 				<ee:transform doc:name="Transform Message" doc:id="827cf4d9-7b46-46ca-a2f3-4abbd32f6e4e" >
 					<ee:message >
 						<ee:set-payload resource="dataweave/siebel-default-error.dwl" />
 					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
-					</ee:variables>
+						
 				</ee:transform>
 			</otherwise>
 		</choice>
@@ -212,41 +305,5 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 			Source="${operations.constants.source}"
 			Target="${operations.constants.target}"
 			Message="#['E &amp; T order salesforce sapi Instance Completed at: ' ++ now()]" />
-		<error-handler >
-			<on-error-propagate type="ANY" enableNotifications="true" logException="true">
-                <module-logging:error-logger doc:name="Error logger" doc:id="d0d68eab-7a0f-4b2c-8e1a-d6d60e9ec094" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Source="#[vars.vOriginatorName]" Target="${operations.constants.target}" Error_Type="#[error.errorType.asString]" Error_Description="#[error.description]" Error_Message="#[error.errorMessage]" Message='#["E and T orders PAPI Call error occurred"]' Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-                <ee:transform>
-                    <ee:message>
-						<ee:set-payload resource="dataweave/siebel-common-error.dwl" />
-                    
-</ee:message>
-                    <ee:variables>
-                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
-                    </ee:variables>
-                </ee:transform>
-            </on-error-propagate>
-		</error-handler>
 	</flow>
-	<sub-flow name="eandt-orders-papi-siebel-error-sub-flow" doc:id="daa40b97-8261-4190-bea7-a1711907ca1e" >
-		<module-logging:error-logger doc:name="Error logger" doc:id="c61a977f-d408-4267-8bd5-31266f78af02" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Source="${operations.constants.source}" Target="${operations.constants.target}" Error_Type="#[error.errorType.asString]" Error_Description="#[error.description]" Error_Message="#[error.errorMessage]" Message="#['Siebel sapi of request call Errored at:' ++ now()]" Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-		<ee:transform doc:name="Transform Message" doc:id="19469f82-32fd-49b0-8a6b-85fe8b78b07e" >
-			<ee:message >
-				<ee:set-payload resource="dataweave/siebel-technical-error.dwl" />
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-	</sub-flow>
-	<sub-flow name="eandt-orders-papi-salesforce-error-sub-flow" doc:id="e7abffcd-8b7f-4514-a026-d21942f85016" >
-		<module-logging:error-logger doc:name="Error logger" doc:id="bfe122a4-3b4a-4bb5-80f7-daaceba04269" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Source="${operations.constants.source}" Target="${operations.constants.target}" Error_Type="#[error.errorType.asString]" Error_Description="#[error.description]" Error_Message="#[error.errorMessage]" Message="#['salesforce sapi of request call Errored at:' ++ now()]" Request_Path="#[vars.vRequestUri]" Method="#[vars.vRequestMethod]" />
-		<ee:transform doc:name="Transform Message" doc:id="03723009-22b9-4e7a-906f-e5e050ca69b9" >
-			<ee:message >
-				<ee:set-payload resource="dataweave/salesforce-technical-error.dwl" />
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-	</sub-flow>
 </mule>

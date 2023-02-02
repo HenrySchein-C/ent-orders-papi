@@ -46,49 +46,9 @@
 						<objectStoreV2>${objectStore}</objectStoreV2>
 						<!-- API Properties -->
 						<properties>
-							<!-- jdedwards -->
-							<as400.truststore.password>${as400.truststore.password}</as400.truststore.password>
-							<as400.us.host>${as400.us.host}</as400.us.host>
-							<as400.us.password>${as400.us.password}</as400.us.password>
-							<as400.us.username>${as400.us.username}</as400.us.username>
-							<as400.us.librarylist>${as400.us.librarylist}</as400.us.librarylist>
-							<as400.us.db.beanconfig.maxTotal>${as400.us.librarylist}</as400.us.db.beanconfig.maxTotal>
-							<as400.us.db.beanconfig.maxWaitMillis>${as400.us.db.beanconfig.maxWaitMillis}</as400.us.db.beanconfig.maxWaitMillis>
-							<as400.us.db.beanconfig.initialSize>${as400.us.db.beanconfig.initialSize}</as400.us.db.beanconfig.initialSize>
-							<as400.us.db.beanconfig.logExpiredConnections>${as400.us.db.beanconfig.logExpiredConnections}</as400.us.db.beanconfig.logExpiredConnections>
-							<as400.us.db.beanconfig.removeAbandonedOnBorrow>${as400.us.db.beanconfig.removeAbandonedOnBorrow}</as400.us.db.beanconfig.removeAbandonedOnBorrow>
-							<as400.us.db.beanconfig.removeAbandonedTimeout>${as400.us.db.beanconfig.removeAbandonedTimeout}</as400.us.db.beanconfig.removeAbandonedTimeout>
-							<as400.us.db.beanconfig.testWhileIdle>${as400.us.db.beanconfig.testWhileIdle}</as400.us.db.beanconfig.testWhileIdle>
-							<as400.us.db.beanconfig.testOnBorrow>${as400.us.db.beanconfig.testOnBorrow}</as400.us.db.beanconfig.testOnBorrow>
-							<as400.us.db.beanconfig.testOnReturn>${as400.us.db.beanconfig.testOnReturn}</as400.us.db.beanconfig.testOnReturn>
-							<as400.us.db.beanconfig.timeBetweenEvictionRunsMillis>${as400.us.db.beanconfig.timeBetweenEvictionRunsMillis}</as400.us.db.beanconfig.timeBetweenEvictionRunsMillis>
-							<as400.us.db.beanconfig.minEvictableIdleTimeMillis>${as400.us.db.beanconfig.minEvictableIdleTimeMillis}</as400.us.db.beanconfig.minEvictableIdleTimeMillis>
-							<as400.us.db.beanconfig.maxConnLifetimeMillis>${as400.us.db.beanconfig.maxConnLifetimeMillis}</as400.us.db.beanconfig.maxConnLifetimeMillis>
-							<as400.us.db.beanconfig.maxidle>${as400.us.db.beanconfig.maxidle}</as400.us.db.beanconfig.maxidle>
-							<as400.reconnection.attempts>${as400.reconnection.attempts}</as400.reconnection.attempts>
-							<as400.reconnection.frequency>${as400.reconnection.frequency}</as400.reconnection.frequency>
-							<as400.can.host>${as400.can.host}</as400.can.host>
-							<as400.can.password>${as400.can.password}</as400.can.password>
-							<as400.can.username>${as400.can.username}</as400.can.username>
-							<as400.can.librarylist>${as400.can.librarylist}</as400.can.librarylist>
-							<as400.can.db.beanconfig.maxTotal>${as400.can.librarylist}</as400.can.db.beanconfig.maxTotal>
-							<as400.can.db.beanconfig.maxWaitMillis>${as400.can.db.beanconfig.maxWaitMillis}</as400.can.db.beanconfig.maxWaitMillis>
-							<as400.can.db.beanconfig.initialSize>${as400.can.db.beanconfig.initialSize}</as400.can.db.beanconfig.initialSize>
-							<as400.can.db.beanconfig.logExpiredConnections>${as400.can.db.beanconfig.logExpiredConnections}</as400.can.db.beanconfig.logExpiredConnections>
-							<as400.can.db.beanconfig.removeAbandonedOnBorrow>${as400.can.db.beanconfig.removeAbandonedOnBorrow}</as400.can.db.beanconfig.removeAbandonedOnBorrow>
-							<as400.can.db.beanconfig.removeAbandonedTimeout>${as400.can.db.beanconfig.removeAbandonedTimeout}</as400.can.db.beanconfig.removeAbandonedTimeout>
-							<as400.can.db.beanconfig.testWhileIdle>${as400.can.db.beanconfig.testWhileIdle}</as400.can.db.beanconfig.testWhileIdle>
-							<as400.can.db.beanconfig.testOnBorrow>${as400.can.db.beanconfig.testOnBorrow}</as400.can.db.beanconfig.testOnBorrow>
-							<as400.can.db.beanconfig.testOnReturn>${as400.can.db.beanconfig.testOnReturn}</as400.can.db.beanconfig.testOnReturn>
-							<as400.can.db.beanconfig.timeBetweenEvictionRunsMillis>${as400.can.db.beanconfig.timeBetweenEvictionRunsMillis}</as400.can.db.beanconfig.timeBetweenEvictionRunsMillis>
-							<as400.can.db.beanconfig.minEvictableIdleTimeMillis>${as400.can.db.beanconfig.minEvictableIdleTimeMillis}</as400.can.db.beanconfig.minEvictableIdleTimeMillis>
-							<as400.can.db.beanconfig.maxConnLifetimeMillis>${as400.can.db.beanconfig.maxConnLifetimeMillis}</as400.can.db.beanconfig.maxConnLifetimeMillis>
-							<as400.can.db.beanconfig.maxidle>${as400.can.db.beanconfig.maxidle}</as400.can.db.beanconfig.maxidle>
-							<!-- objectStore_config -->
-							<objectstore.reconnection.attempts>${objectstore.reconnection.attempts}</objectstore.reconnection.attempts>
-							<objectstore.reconnection.frequency>${objectstore.reconnection.frequency}</objectstore.reconnection.frequency>
-							<objectstore.entry.ttl.restriction>${objectstore.entry.ttl.restriction}</objectstore.entry.ttl.restriction>
-							<operations.constants.restriction.batchSize>${operations.constants.restriction.batchSize}</operations.constants.restriction.batchSize>
+							
+							
+							
 							<!-- http_config -->
 							<http.request.timeout>${http.request.timeout}</http.request.timeout>
 							<http.request.basepath>${http.request.basepath}</http.request.basepath>
@@ -155,12 +115,6 @@
 			<artifactId>munit-tools</artifactId>
 			<version>2.3.13</version>
 			<classifier>mule-plugin</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.weave</groupId>
-			<artifactId>assertions</artifactId>
-			<version>1.0.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
