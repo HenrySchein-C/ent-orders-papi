@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:module-logging="http://www.mulesoft.org/schema/mule/module-logging"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schema/mule/module-logging/current/mule-module-logging.xsd">
+	<sub-flow name="update-Record-Data-Siebel-Sapi"
+		doc:id="8038b21c-9070-424b-93c9-4ac04169e8b3">
+		<set-variable value="#[now()]" doc:name="Set Variable"
+			doc:id="cabfddff-475b-442e-a00c-9320755d68e2"
+			variableName="vDebugStartTime" />
+		<module-logging:debug-start-logger
+			doc:name="Debug start logger"
+			doc:id="3b6c496d-beae-40cd-a8fd-03e55e85e604"
+			Application_Name="#[app.name]"
+			Flow_Name="update-Record-Data-Siebel-Sapi"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Update ENT orders in siebel call started for ' ++ vars.vRecordId]" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="59b4326c-515f-4d04-a4e2-e2565d3c17c9">
+			<ee:message>
+				<ee:set-payload
+					resource="dataweave/final-Siebel-Response-payload.dwl" />
+			</ee:message>
+		</ee:transform>
+		<http:request method="PUT" doc:name="SiebelSapi"
+			doc:id="2d065476-c55e-4c97-b99c-d3cf454bb08a"
+			config-ref="sapi_http_request_configuration"
+			path="#[Mule::p('http.request.basepath') ++ '/orderresponse/id/' ++ vars.vRecordId]">
+			<http:headers><![CDATA[#[output application/json
+---
+{
+	"client_id" : Mule::p('http.request.headers.siebel.client.id'),
+	"client_secret" : Mule::p('http.request.headers.siebel.client.secret'),
+	"Content-Type" : Mule::p('Content-Type'),
+	"x-origination-code" : Mule::p('x-origination-code'),
+	"x-implementation": Mule::p('x-implementation')
+}]]]></http:headers>
+		</http:request>
+		<module-logging:debug-end-logger
+			doc:name="Debug end logger"
+			doc:id="0b878d15-a9ee-43bf-89a1-e2796fcadd4b"
+			Application_Name="#[app.name]"
+			Flow_Name="update-Record-Data-Siebel-Sapi"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Updated ENT orders in siebel for ' ++ vars.vRecordId]"
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
+	</sub-flow>
+	<sub-flow name="load-Record-Data-Salesforce-Sapi"
+		doc:id="76db27bd-4d0d-4fe6-baae-1ea9b17331b0">
+		<set-variable value="#[now()]" doc:name="Set Variable"
+			doc:id="bd6e0de1-61c6-4280-a8f7-9e3536e51cff"
+			variableName="vDebugStartTime" />
+		<module-logging:debug-start-logger
+			doc:name="Debug start logger"
+			doc:id="c54fb065-a280-47d7-9804-e112b64c7dce"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Load records into salesforce call started for ' ++ vars.vRecordId]" />
+		<try doc:name="Try" doc:id="f2f9aad2-44de-4d7b-a24d-6c800bea5697">
+			<http:request method="POST"
+				doc:name="callSalesforceSapi"
+				doc:id="05b4e3bc-4fbd-4d9a-8978-3d671f804f4c"
+				path="${http.request.sbasepath}/orders"
+				config-ref="sapi_http_request_configuration">
+				<http:headers><![CDATA[#[output application/json
+---
+{
+	"client_id" : Mule::p('http.request.headers.salesforce.client.id'),
+	"client_secret" : Mule::p('http.request.headers.salesforce.client.secret'),
+	"x-origination-code" : Mule::p('x-origination-code'),
+	"x-implementation": Mule::p('x-implementation')
+}]]]></http:headers>
+			</http:request>
+			<error-handler>
+				<on-error-continue enableNotifications="true"
+					logException="true" doc:name="On Error Continue"
+					doc:id="b1bcdfb9-8233-4b09-b177-f3c945c1785e">
+					<set-variable value="#[payload]"
+						doc:name="Set Variable"
+						doc:id="ceb6a2f0-cb39-4de1-9200-44e68360908c"
+						variableName="vErrorSet" />
+					<module-logging:error-logger
+						doc:name="Error logger"
+						doc:id="10601b5f-dc43-4446-830e-eb6178279d0a"
+						Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+						Transaction_Id="#[vars.vCorrelationId]"
+						Correlation_Id="#[vars.vCorrelationId]"
+						Environment="${environment}"
+						Source="${operations.constants.source}"
+						Target="${operations.constants.target}"
+						Error_Type="#[error.errorType.asString]"
+						Error_Description="#[error.description]"
+						Error_Message="#[error.errorMessage]"
+						Message="#['salesforce sapi of request call Errored at:' ++ now()]" />
+					<ee:transform doc:name="Transform Message"
+						doc:id="c8a56f8c-b469-4459-9bd3-2d86d32b40ba">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable resource="dataweave/vErrorDescription.dwl" variableName="vErrorDescription" />
+							<ee:set-variable resource="dataweave/vErrorType.dwl" variableName="vErrorType" />
+						</ee:variables>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<module-logging:debug-end-logger
+			doc:name="Debug end logger"
+			doc:id="7957be74-3d62-41c3-bede-a9589adfca76"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Load records into salesforce call ended for ' ++ vars.vRecordId]"
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
+	</sub-flow>
+	<sub-flow name="get-Record-Data-Siebel-Sapi"
+		doc:id="2ac46424-1fd8-464d-9083-ea3de9439964">
+		<set-variable value="#[now()]" doc:name="Set Variable"
+			doc:id="45961dd2-ef6c-4915-b0b0-2ba45280640a"
+			variableName="vDebugStartTime" />
+		<module-logging:debug-start-logger
+			doc:name="Debug start logger"
+			doc:id="a9ebba4a-28b2-45d3-954e-597fe0668bfb"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Get records data in siebel call started ']" />
+		<http:request method="GET"
+			doc:name="invoke-CLOB-siebel-sapi"
+			doc:id="f3111a6d-d354-4470-b9b0-be44c55e4f82"
+			config-ref="sapi_http_request_configuration"
+			path="#[Mule::p('http.request.basepath') ++ '/orders/id/' ++ payload]">
+			<http:body><![CDATA[#[{}]]]></http:body>
+			<http:headers><![CDATA[#[output application/json
+---
+{
+	"client_id" : Mule::p('http.request.headers.siebel.client.id'),
+	"client_secret" : Mule::p('http.request.headers.siebel.client.secret'),
+	"Content-Type" : Mule::p('Content-Type'),
+	"x-origination-code" : Mule::p('x-origination-code'),
+	"x-implementation": Mule::p('x-implementation')
+}]]]></http:headers>
+		</http:request>
+		<module-logging:debug-end-logger
+			doc:name="Debug end logger"
+			doc:id="6018222a-c9de-4ea8-befa-9a2832482a50"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Get records data in siebel call ended']"
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
+	</sub-flow>
+	<sub-flow name="get-Record-Id-Siebel-Sapi"
+		doc:id="5f8db23a-6885-4979-bafd-f039f3df781d">
+		<module-logging:debug-start-logger
+			doc:name="Debug start logger"
+			doc:id="f8a00dc6-1847-4457-bd89-7563b46f908f"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="${operations.constants.source}"
+			Target="${operations.constants.target}"
+			Message="#['Get records Id from siebel call started ']" />
+		<http:request method="GET"
+			doc:name="invoke E and T-Siebel-Sapi"
+			doc:id="252251ca-9d46-45ff-9726-2516dc63f8a2"
+			path="#[Mule::p('http.request.basepath') ++ '/orders']"
+			config-ref="sapi_http_request_configuration"
+			sendCorrelationId="ALWAYS">
+			<http:headers><![CDATA[#[output application/json
+---
+{
+	"client_id" : Mule::p('http.request.headers.siebel.client.id'),
+	"client_secret" : Mule::p('http.request.headers.siebel.client.secret'),
+	"Content-Type" : Mule::p('Content-Type'),
+	"x-origination-code" : Mule::p('x-origination-code'),
+	"x-implementation": Mule::p('x-implementation')
+}]]]></http:headers>
+		</http:request>
+		<module-logging:debug-end-logger
+			doc:name="Debug end logger"
+			doc:id="929e2e9c-b681-4171-b82a-ad4e80cfb5c6"
+			Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]"
+			Transaction_Id="#[vars.vCorrelationId]"
+			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
+			Source="{operations.constants.source}"
+			Target="{operations.constants.target}"
+			Message="#['Get records Id from siebel call ended ']"
+			Time_Taken="#[output application/json --- now() - vars.vStartTime]" />
+	</sub-flow>
+	
+</mule>

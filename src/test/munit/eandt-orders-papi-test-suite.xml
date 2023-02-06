@@ -53,6 +53,11 @@
 			<munit-tools:assert-that doc:name="Assert that" doc:id="52d415f3-4a67-4343-936b-1d4a3821a187" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
 		</munit:validation>
 	</munit:test>
+	<munit:test name="eandt-orders-papi-test-suite-get-Record-Id-Siebel-SapiTest" doc:id="5bffafe4-9ec9-4a15-8d9b-6efc09591e1e" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-Record-Id-Siebel-Sapi" doc:id="88e6976f-a467-4d11-b612-6198da9a1a09" name="get-Record-Id-Siebel-Sapi"/>
+		</munit:execution>
+	</munit:test>
 
 
 </mule>

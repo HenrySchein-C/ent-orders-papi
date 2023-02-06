@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>us.co.hs</groupId>
-	<artifactId>et-orders-sapi</artifactId>
+	<artifactId>et-orders-papi</artifactId>
 	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
@@ -52,10 +52,15 @@
 							<!-- http_config -->
 							<http.request.timeout>${http.request.timeout}</http.request.timeout>
 							<http.request.basepath>${http.request.basepath}</http.request.basepath>
+							<http.request.basepath>${http.request.sbasepath}</http.request.basepath>
 							<http.request.host>${http.request.host}</http.request.host>
 							<http.request.port>${http.request.port}</http.request.port>
 							<http.request.client.secret>${http.request.client.secret}</http.request.client.secret>
-							<http.request.client.id>${http.request.client.id}</http.request.client.id>
+							<http.request.client.id>${http.request.client.id}</http.request.client.id>	
+							<http.request.client.id>${http.request.headers.siebel.client.id}</http.request.client.id>
+							<http.request.client.id>${http.request.headers.siebel.client.secret}</http.request.client.id>
+							<http.request.client.id>${http.request.headers.salesforce.client.secret}</http.request.client.id>
+							<http.request.client.id>${http.request.headers.salesforce.client.id}</http.request.client.id>
 							<!-- anypointPlatform_config -->
 							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
 							<anypoint.platform.visualizer.layer>${api_layer}</anypoint.platform.visualizer.layer>

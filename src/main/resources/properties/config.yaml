@@ -37,5 +37,18 @@ http:
   request:
     basepath: "/dev/sapi/ent-orders-siebel/v1"
     sbasepath: "/dev/sapi/ent-orders-salesforce/v1"
+    headers:
+      siebel:
+        client:
+          id: "2666b1bf9bed4ecdb3d3e6871b217a05"
+          secret: "d4cf6CdC5A3040bbB121A1Ee979bBAB0"
+      salesforce:
+        client:
+          id: "64a71b2c1e6c4e4e8c4eb486f593d24b"
+          secret: "b0566F426c6F4D74BBDb915BA9D70A5E"
+x-origination-code: "Siebel"
+x-implementation: "ENT Orders"
+Content-Type: "application/json"
+ 
     
     
