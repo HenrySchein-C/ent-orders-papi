@@ -26,16 +26,16 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 			</ee:variables>
 		</ee:transform>
 		<module-logging:start-logger doc:name="Start logger" doc:id="ee875a41-ee7c-429b-acc6-5903b37ba275" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Source="${operations.constants.source}" Target="${operations.constants.target}" Message="#['E &amp; T orders PAPI flow Started']" />
-		<flow-ref doc:name="Flow Reference" doc:id="f17c92e8-84fb-4717-84e5-e5955d8f4a40" name="get-Record-Id-Siebel-Sapi" />
+		<flow-ref doc:name="Flow to refer get-Record-Id-Siebel-Sapi" doc:id="f17c92e8-84fb-4717-84e5-e5955d8f4a40" name="get-Record-Id-Siebel-Sapi" />
 		<choice doc:name="check_Payload_Empty_Or_Not" doc:id="4ca5e623-6364-47d1-a334-3b070855ce1a">
 			<when expression="#[sizeOf(payload.recordIds)&gt;0]">
 
 				<foreach doc:name="for_Each_Orders" doc:id="3b955c11-476a-4dd4-8d21-71db7788dd97" collection="#[payload.recordIds]">
 					<try doc:name="Try" doc:id="3ce96fe9-3a73-4683-853e-c79d74615ae5" >
 						<set-variable value="#[payload]" doc:name="Set Variable" doc:id="0c952f5c-ddd9-4204-b822-0a3353e3670c" variableName="vRecordId" />
-						<flow-ref doc:name="Flow Reference" doc:id="31a8fb96-1a6b-40eb-8dd6-4c5156dec309" name="get-Record-Data-Siebel-Sapi" />
-						<flow-ref doc:name="Flow Reference" doc:id="35b0a63a-33fe-443b-bdae-dd49941c3489" name="load-Record-Data-Salesforce-Sapi" />
-						<flow-ref doc:name="Flow Reference" doc:id="012303b9-5b2f-4149-ae08-d8426502c46e" name="update-Record-Data-Siebel-Sapi" />
+						<flow-ref doc:name="flow to get-Record-Data-Siebel-Sapi" doc:id="31a8fb96-1a6b-40eb-8dd6-4c5156dec309" name="get-Record-Data-Siebel-Sapi" />
+						<flow-ref doc:name="flow to load-Record-Data-Salesforce-Sapi" doc:id="35b0a63a-33fe-443b-bdae-dd49941c3489" name="load-Record-Data-Salesforce-Sapi" />
+						<flow-ref doc:name="flow to update-Record-Data-Siebel-Sapi" doc:id="012303b9-5b2f-4149-ae08-d8426502c46e" name="update-Record-Data-Siebel-Sapi" />
 						<error-handler >
 							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="231bb032-c1e9-414b-a59c-ef4c58e79a34" >
 								<module-logging:error-logger doc:name="Error logger" doc:id="97b63afd-3f1c-4de3-8a89-b1553b49a0d7" Application_Name="#[app.name]" Flow_Name="#[vars.vFlowName]" Transaction_Id="#[vars.vCorrelationId]" Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}" Source="${operations.constants.source}" Target="${operations.constants.target}" Error_Type="#[error.errorType.asString]" Error_Description="#[error.description]" Error_Message="#[error.errorMessage]" Message="#['salesforce sapi of request call Errored at:' ++ now()]" />

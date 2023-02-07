@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-test-suite.xml" />
+	<munit:test name="implementation-test-suite-eandt-orders-papiFlowTest" doc:id="3f63e337-e811-4f84-9a4a-cdcb7b8a92b9" description="Test" ignore="true">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="038e1147-636e-4b09-ac56-4435d515b393" >
+				<munit:payload value='#[output application/json&#10;---&#10;{&#10;    "recordIds": [1,&#10;    	2&#10;    ]&#10;}]' />
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a5610a38-beba-4d0f-aadf-5df3889f0247" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow to refer get-Record-Id-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c7c62e2a-cb2e-4840-92f8-2707a389bbef" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="flow to get-Record-Data-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="3cac4892-b033-4454-8ef6-773df3245c51" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="flow to load-Record-Data-Salesforce-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="768b091b-72e4-4a09-a99e-1b9329455b66" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="flow to update-Record-Data-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to eandt-orders-papiFlow" doc:id="d9793d78-0532-4506-9a71-354b48cd5605" name="eandt-orders-papiFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c2c86eb6-1f17-4918-ac66-c915a79dcb7b" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementation-test-suite-eandt-orders-papi-error-Flow" doc:id="ca0fff77-ed16-4daf-9e2c-a1dfecabc400" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="a7177aa9-c8d1-408c-9278-683265ad7b64" >
+				<munit:payload value='#[output application/json&#10;---&#10;{&#10;    "recordIds": [&#10;    	&#10;    ]&#10;}]' />
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="718cdf5f-c6dd-4776-bf2e-19d29359558a" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Flow to refer get-Record-Id-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when1" doc:id="15dd1975-69c2-4563-96c9-4bb48d36be78" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="flow to get-Record-Data-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when2" doc:id="5357c430-7383-416c-a209-40aba6c78b74" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="flow to load-Record-Data-Salesforce-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when3" doc:id="655e2159-0fed-41ac-b899-b8baa41806c0" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="flow to update-Record-Data-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to eandt-orders-papiFlow" doc:id="3fc786ce-9f1d-48c4-b896-39f33f217081" name="eandt-orders-papiFlow" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="58fd258c-6b66-492c-839e-a16304d3ab74" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

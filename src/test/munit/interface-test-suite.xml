@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="interface-test-suite.xml" />
+	<munit:test name="interface-test-suite-load-Record-Data-Salesforce-SapiTest" doc:id="5cd71635-d227-407f-bff7-0460bad88514" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="d7cf4475-f74f-41c9-a129-a436fbc212b2" >
+				<munit:payload value='#[output application/json&#10;---&#10;{&#10;    "rationingRequest": {&#10;        "accountInfo": {&#10;            "billTo": "131061",&#10;            "shipTo": "131064",&#10;            "countryId": "US",&#10;            "companyId": "01000"&#10;        },&#10;        "productEntries": [&#10;            {&#10;                "sku": "1065857",&#10;                "quantity": 10,&#10;                "unitOfMeasure": "EA"&#10;            },&#10;            {&#10;                "sku": "1339662",&#10;                "quantity": 7,&#10;                "unitOfMeasure": "BX"&#10;            }&#10;        ]&#10;    }&#10;}]' />
+				<munit:variables >
+					<munit:variable key="vRecordId" value="1" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="40b993d9-3000-422a-b2d3-d6f34178ffc2" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="callSalesforceSapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to load-Record-Data-Salesforce-Sapi" doc:id="3b9d5c6e-6828-45f1-b8d7-c0ceeef5c6f2" name="load-Record-Data-Salesforce-Sapi"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="a049bc51-10cc-4f06-9aff-7ab1b85264d4" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="interface-test-suite-get-Record-Data-Siebel-SapiTest" doc:id="7a2f5406-6999-4eed-b5a1-44382eb59dfd" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="dd261234-ac93-4248-bb77-c985874befc2" >
+				<munit:payload value='#[output application/json&#10;---&#10;{&#10;    "recordIds": [1,&#10;    	2&#10;    ]&#10;}]' />
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0f4005f0-c2c7-4570-84f5-98ca1fc5923b" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-CLOB-siebel-sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-Record-Data-Siebel-Sapi" doc:id="43432141-d6ad-43f5-9189-de406d77ff83" name="get-Record-Data-Siebel-Sapi"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="dd1c90ac-89e2-444f-8695-e45780c74e1b" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="interface-test-suite-get-Record-Id-Siebel-SapiTest" doc:id="a2920b90-5c0d-46e7-b08e-5d79f4164430" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9c784ea1-1395-48c5-849f-babe680a842d" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke E and T-Siebel-Sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "recordIds": [1,2]&#10;}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get-Record-Id-Siebel-Sapi" doc:id="e0c922fb-ce27-485a-a900-4b1f7007e8e9" name="get-Record-Id-Siebel-Sapi"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="83cf70cd-c381-452e-b6ca-42a924a0c0f2" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="interface-test-suite-update-Record-Data-Siebel-SapiTest" doc:id="65fece83-7b86-47f1-99d0-86e040c72ed0" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="91b001f9-8029-43f0-bce5-b0440d578103" >
+				<munit:payload value='#[output application/json&#10;---&#10;{&#10;    "rationingRequest": {&#10;        "accountInfo": {&#10;            "billTo": "131061",&#10;            "shipTo": "131064",&#10;            "countryId": "US",&#10;            "companyId": "01000"&#10;        },&#10;        "productEntries": [&#10;            {&#10;                "sku": "1065857",&#10;                "quantity": 10,&#10;                "unitOfMeasure": "EA"&#10;            },&#10;            {&#10;                "sku": "1339662",&#10;                "quantity": 7,&#10;                "unitOfMeasure": "BX"&#10;            }&#10;        ]&#10;    }&#10;}]' />
+				<munit:variables >
+					<munit:variable key="vRecordId" value="2" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="dccf1aa5-2f3c-47c7-a2e7-2ce253639606" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="invoke-CLOB-siebel-sapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to update-Record-Data-Siebel-Sapi" doc:id="f66fadb9-abf8-4b55-b315-7d41a66c9f4c" name="update-Record-Data-Siebel-Sapi"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="f1d1589d-42c8-4b6d-acef-d0ac95fdb415" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="interface-test-suite-load-Record-Data-error-Salesforce-SapiTest" doc:id="8247b307-8991-4fc7-bdc9-ce31641d2b04" description="Test" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="759ac782-5034-431f-9ef2-4619f2feedec" >
+				<munit:payload value='#[output application/json&#10;---&#10;{&#10;    "rationingRequest": {&#10;        "accountInfo": {&#10;            "billTo": "131061",&#10;            "shipTo": "131064",&#10;            "countryId": "US",&#10;            "companyId": "01000"&#10;        },&#10;        "productEntries": [&#10;            {&#10;                "sku": "1065857",&#10;                "quantity": 10,&#10;                "unitOfMeasure": "EA"&#10;            },&#10;            {&#10;                "sku": "1339662",&#10;                "quantity": 7,&#10;                "unitOfMeasure": "BX"&#10;            }&#10;        ]&#10;    }&#10;}]' />
+				<munit:variables >
+					<munit:variable key="vRecordId" value="1" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="326bdc4c-95f6-45d9-82c7-5e7eafdf2b61" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="callSalesforceSapi" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to load-Record-Data-Salesforce-Sapi" doc:id="30d0f037-0c4c-461f-888f-eacf7fb4b69a" name="load-Record-Data-Salesforce-Sapi" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="a6946b80-d77c-42ae-80c4-ae4c68a185ec" is="#[MunitTools::notNullValue()]" expression="#[payload]" />
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

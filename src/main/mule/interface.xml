@@ -72,7 +72,7 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 			Correlation_Id="#[vars.vCorrelationId]" Environment="${environment}"
 			Source="${operations.constants.source}"
 			Target="${operations.constants.target}"
-			Message="#['Load records into salesforce call started for ' ++ vars.vRecordId]" />
+			Message="#['Load records into salesforce call started for '  ++ vars.vRecordId]" />
 		<try doc:name="Try" doc:id="f2f9aad2-44de-4d7b-a24d-6c800bea5697">
 			<http:request method="POST"
 				doc:name="callSalesforceSapi"
@@ -175,6 +175,7 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 	</sub-flow>
 	<sub-flow name="get-Record-Id-Siebel-Sapi"
 		doc:id="5f8db23a-6885-4979-bafd-f039f3df781d">
+		<set-variable value="#[now()]" doc:name="Set Variable" doc:id="8892329a-4a66-4135-bd5c-3001266631d2" variableName="vDebugStartTime" />
 		<module-logging:debug-start-logger
 			doc:name="Debug start logger"
 			doc:id="f8a00dc6-1847-4457-bd89-7563b46f908f"
@@ -209,7 +210,7 @@ http://www.mulesoft.org/schema/mule/module-logging http://www.mulesoft.org/schem
 			Source="{operations.constants.source}"
 			Target="{operations.constants.target}"
 			Message="#['Get records Id from siebel call ended ']"
-			Time_Taken="#[output application/json --- now() - vars.vStartTime]" />
+			Time_Taken="#[output application/json --- now() - vars.vDebugStartTime]" />
 	</sub-flow>
 	
 </mule>
